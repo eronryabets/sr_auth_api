@@ -11,21 +11,35 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
+from datetime import timedelta
+import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+env = environ.Env(
+    DEBUG=bool,
+    SECRET_KEY_AUTH_API=str,
+
+    DATABASE_NAME_AUTH=str,
+    DATABASES_USER_AUTH=str,
+    DATABASES_PASSWORD_AUTH=str,
+    DATABASE_HOST_AUTH=str,
+    DATABASE_PORT_AUTH=(int, 5432),
+)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-ue&5@*0p35b-cwm#v6rf-21(#n#&t%u9bm0yzcp@(2j_w9+lx)'
+SECRET_KEY = env('SECRET_KEY_AUTH_API')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']  # (!) в продакшене указать конкретные домены
+# ALLOWED_HOSTS = ['auth.localhost', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -75,10 +89,14 @@ WSGI_APPLICATION = 'sr_auth_api.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    "default": {
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": env('DATABASE_NAME_AUTH'),
+        "USER":  env('DATABASES_USER_AUTH'),
+        "PASSWORD": env('DATABASES_PASSWORD_AUTH'),
+        "HOST": env('DATABASE_HOST_AUTH'),
+        "PORT": env('DATABASE_PORT_AUTH'),
+    },
 }
 
 
@@ -116,7 +134,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+# Путь к папке для хранения медиафайлов
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
