@@ -31,6 +31,7 @@ class UserProfileView(APIView):
     def get(self, request):
         user = request.user
         return Response({
+            'id': user.id,
             'username': user.username,
             'email': user.email,
             'role': 'admin' if user.is_staff else 'user',
