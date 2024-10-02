@@ -17,7 +17,7 @@ COPY . /app/
 EXPOSE 8000
 
 # Выполнение миграций
-RUN python manage.py makemigrations && python manage.py migrate
+#RUN python manage.py makemigrations && python manage.py migrate
 
 # Запуск тестов
 # RUN python manage.py test

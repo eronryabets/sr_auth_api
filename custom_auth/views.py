@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User, Group
+from .models import CustomUser
 from rest_framework import generics, permissions, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -14,23 +14,22 @@ from rest_framework import status
 
 # Регистрация
 class RegisterView(generics.CreateAPIView):
-    queryset = User.objects.all()
+    queryset = CustomUser.objects.all()
     serializer_class = RegisterSerializer
     permission_classes = [permissions.AllowAny]
 
     def perform_create(self, serializer):
         user = serializer.save()
-        user_group = Group.objects.get(name='user')  # Назначаем группу по умолчанию
-        user.groups.add(user_group)
+        # user_group = Group.objects.get(name='user')  # Назначаем группу по умолчанию
+        # user.groups.add(user_group)
 
 
-# Получение UPDATE данных текущего пользователя
+# Получение данных текущего пользователя
 class UserProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         user = request.user
-        # Отправляем данные о пользователе, включая его роль
         return Response({
             'username': user.username,
             'email': user.email,
@@ -54,6 +53,7 @@ class LogoutView(APIView):
         return response
 
 
+# Логин и получение токенов
 class CustomTokenObtainPairView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
@@ -73,24 +73,25 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         response.set_cookie(
             key='access_token',
             value=access_token,
-            httponly=True,  # фронтенд будет пытаться получить токен через JS, что не рекомендуется
-            secure=False,  # Установи True для HTTPS # Установите False для разработки
-            samesite='Lax',  # Ограничивает отправку токенов в разных контекстах
+            httponly=True,    # фронтенд будет пытаться получить токен через JS, что не рекомендуется
+            secure=False,     # Установи True для HTTPS # Установите False для разработки
+            samesite='Lax',   # Ограничивает отправку токенов в разных контекстах
             expires=access_expiry
         )
 
         response.set_cookie(
             key='refresh_token',
             value=refresh_token,
-            httponly=True,  # фронтенд будет пытаться получить токен через JS, что не рекомендуется
-            secure=False,  # Установи True для HTTPS # Установите False для разработки
-            samesite='Lax',  # Ограничивает отправку токенов в разных контекстах
+            httponly=True,
+            secure=False,
+            samesite='Lax',
             expires=refresh_expiry
         )
 
         return response
 
 
+# Обновление токена
 class CookieTokenRefreshView(APIView):
     def post(self, request):
         # Извлекаем refresh_token из cookies
@@ -118,7 +119,7 @@ class CookieTokenRefreshView(APIView):
             key='access_token',
             value=str(access_token),
             httponly=True,
-            secure=False,  # Поставь True для HTTPS
+            secure=False,
             samesite='Lax',
             expires=access_expiry
         )
