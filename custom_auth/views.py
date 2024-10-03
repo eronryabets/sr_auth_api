@@ -64,8 +64,15 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         access_token = data.get('access')
         refresh_token = data.get('refresh')
 
-        # Создаем ответ с пустым телом (мы отправляем токены через cookies)
-        response = JsonResponse({"message": "Login successful"})
+        # Получаем пользователя на основе введенных данных
+        user = self.get_user(request.data['username'])
+
+        # Создаем ответ с телом, которое включает имя пользователя и почту
+        response = JsonResponse({
+            "message": "Login successful",
+            "username": user.username,
+            "email": user.email,
+        })
 
         # Устанавливаем токены в httpOnly cookies
         access_expiry = datetime.datetime.utcnow() + datetime.timedelta(minutes=60)
@@ -90,6 +97,11 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         )
 
         return response
+
+    def get_user(self, username):
+        from django.contrib.auth import get_user_model
+        user = get_user_model()
+        return user.objects.get(username=username)
 
 
 # Обновление токена
