@@ -82,19 +82,21 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         response.set_cookie(
             key='access_token',
             value=access_token,
-            httponly=True,    # фронтенд будет пытаться получить токен через JS, что не рекомендуется
-            secure=False,     # Установи True для HTTPS # Установите False для разработки
-            samesite='Lax',   # Ограничивает отправку токенов в разных контекстах
-            expires=access_expiry
+            httponly=True,  # фронтенд будет пытаться получить токен через JS, что не рекомендуется
+            secure=False,  # Установи True для HTTPS # Установите False для разработки
+            samesite='Lax',  # Ограничивает отправку токенов в разных контекстах
+            expires=access_expiry,
+            domain=".drunar.space"  # Делаем куки доступными для всех поддоменов
         )
 
         response.set_cookie(
             key='refresh_token',
             value=refresh_token,
-            httponly=True,
+            httponly=True, #True
             secure=False,
             samesite='Lax',
-            expires=refresh_expiry
+            expires=refresh_expiry,
+            domain=".drunar.space"  # Делаем куки доступными для всех поддоменов
         )
 
         return response
