@@ -70,6 +70,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         # Создаем ответ с телом, которое включает имя пользователя и почту
         response = JsonResponse({
             "message": "Login successful",
+            "id": user.id,
             "username": user.username,
             "email": user.email,
         })
