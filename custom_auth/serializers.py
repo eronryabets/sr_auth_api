@@ -25,3 +25,33 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['id', 'username', 'email']
+
+
+class UserProfileUpdateSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, required=False)
+
+    class Meta:
+        model = CustomUser
+        fields = ['email', 'password']
+
+    def validate_email(self, value):
+        """
+        Проверка, существует ли пользователь с такой же почтой.
+        """
+        if CustomUser.objects.filter(email=value).exists():
+            raise serializers.ValidationError("This email is already in use.")
+        return value
+
+    def update(self, instance, validated_data):
+        # Обновление почты
+        email = validated_data.get('email', None)
+        if email:
+            instance.email = email
+
+        # Обновление пароля, если передано новое значение
+        password = validated_data.get('password', None)
+        if password:
+            instance.set_password(password)
+
+        instance.save()
+        return instance
