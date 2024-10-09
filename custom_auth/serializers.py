@@ -38,7 +38,8 @@ class UserProfileUpdateSerializer(serializers.ModelSerializer):
         """
         Проверка, существует ли пользователь с такой же почтой.
         """
-        if CustomUser.objects.filter(email=value).exists():
+        user_id = self.instance.id
+        if CustomUser.objects.exclude(id=user_id).filter(email=value).exists():
             raise serializers.ValidationError("This email is already in use.")
         return value
 

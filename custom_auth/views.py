@@ -43,6 +43,9 @@ class UserProfileView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
+        # Проверка, если email уже существует
+        if 'email' in serializer.errors:
+            return Response({'detail': 'Email already exists.'}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

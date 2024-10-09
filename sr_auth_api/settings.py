@@ -36,7 +36,8 @@ env = environ.Env(
 SECRET_KEY = env('SECRET_KEY_AUTH_API')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env('DEBUG')
+# DEBUG = env('DEBUG')
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']  # (!) в продакшене указать конкретные домены
 # ALLOWED_HOSTS = ['custom_auth.localhost', 'localhost', '127.0.0.1']
