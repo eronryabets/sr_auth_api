@@ -182,6 +182,7 @@ AUTH_USER_MODEL = 'custom_auth.CustomUser'
 INTERNAL_IPS = [
     '127.0.0.1',
     'localhost',
+    'drunar.space',
 ]
 
 # CORS settings
