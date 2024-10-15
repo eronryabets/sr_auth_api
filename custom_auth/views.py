@@ -148,7 +148,8 @@ class CookieTokenRefreshView(APIView):
             httponly=True,
             secure=False,
             samesite='Lax',
-            expires=access_expiry
+            expires=access_expiry,
+            domain=".drunar.space"
         )
 
         return response
