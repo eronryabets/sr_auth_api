@@ -219,6 +219,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://text.drunar.space",
     "http://book.drunar.space",
     "http://translator.drunar.space",
+    "http://dictionary.drunar.space",
 
 ]
 
@@ -230,6 +231,7 @@ CSRF_TRUSTED_ORIGINS = [
     "http://text.drunar.space",
     "http://book.drunar.space",
     "http://translator.drunar.space",
+    "http://dictionary.drunar.space",
 
 ]
 
