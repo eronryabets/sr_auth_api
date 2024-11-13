@@ -144,7 +144,7 @@ class CookieTokenRefreshView(APIView):
 
         response.set_cookie(
             key='access_token',
-            value=str(access_token),
+            value=access_token,
             httponly=True,
             secure=False,
             samesite='Lax',
