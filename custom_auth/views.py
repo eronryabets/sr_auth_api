@@ -14,11 +14,25 @@ from rest_framework import status
 
 # Регистрация
 class RegisterView(generics.CreateAPIView):
+    """
+    Представление для регистрации нового пользователя.
+
+    Позволяет любому пользователю создавать новый аккаунт, предоставляя необходимые данные.
+    """
     queryset = CustomUser.objects.all()
     serializer_class = RegisterSerializer
     permission_classes = [permissions.AllowAny]
 
     def perform_create(self, serializer):
+        """
+        Переопределяет метод для дополнительной обработки при создании пользователя.
+
+        В текущей реализации можно добавить пользователя в определённую группу,
+        раскомментировав соответствующие строки.
+
+        :param serializer: Сериализатор, содержащий данные для создания пользователя.
+        :type serializer: RegisterSerializer
+        """
         user = serializer.save()
         # user_group = Group.objects.get(name='user')  # Назначаем группу по умолчанию
         # user.groups.add(user_group)
@@ -26,9 +40,22 @@ class RegisterView(generics.CreateAPIView):
 
 # Получение данных текущего пользователя
 class UserProfileView(APIView):
+    """
+    Представление для получения и обновления профиля аутентифицированного пользователя.
+
+    Позволяет пользователю просматривать свои данные и вносить изменения в профиль.
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        """
+        Обрабатывает GET-запрос для получения данных текущего пользователя.
+
+        :param request: HTTP-запрос.
+        :type request: rest_framework.request.Request
+        :return: Ответ с данными пользователя.
+        :rtype: rest_framework.response.Response
+        """
         user = request.user
         return Response({
             'id': user.id,
@@ -38,6 +65,17 @@ class UserProfileView(APIView):
         })
 
     def patch(self, request):
+        """
+        Обрабатывает PATCH-запрос для частичного обновления профиля текущего пользователя.
+
+        Позволяет обновлять поля `email` и `password`. Если `email` уже существует,
+        возвращает соответствующую ошибку.
+
+        :param request: HTTP-запрос с данными для обновления.
+        :type request: rest_framework.request.Request
+        :return: Ответ с обновлёнными данными пользователя или ошибками.
+        :rtype: rest_framework.response.Response
+        """
         user = request.user
         serializer = UserProfileUpdateSerializer(user, data=request.data, partial=True)
         if serializer.is_valid():
@@ -50,7 +88,20 @@ class UserProfileView(APIView):
 
 
 class LogoutView(APIView):
+    """
+    Представление для выхода пользователя из системы.
+
+    Аннулирует refresh-токен и удаляет токены из cookies.
+    """
     def post(self, request):
+        """
+        Обрабатывает POST-запрос для выхода пользователя.
+
+        :param request: HTTP-запрос.
+        :type request: rest_framework.request.Request
+        :return: Ответ с сообщением об успешном выходе.
+        :rtype: rest_framework.response.Response
+        """
         try:
             refresh_token = request.COOKIES.get('refresh_token')
             token = RefreshToken(refresh_token)
@@ -67,7 +118,20 @@ class LogoutView(APIView):
 
 # Логин и получение токенов
 class CustomTokenObtainPairView(TokenObtainPairView):
+    """
+    Представление для аутентификации пользователя и получения JWT-токенов.
+
+    При успешной аутентификации возвращает токены и устанавливает их в httpOnly cookies.
+    """
     def post(self, request, *args, **kwargs):
+        """
+        Обрабатывает POST-запрос для аутентификации и получения токенов.
+
+        :param request: HTTP-запрос с данными аутентификации.
+        :type request: rest_framework.request.Request
+        :return: Ответ с сообщением и установкой токенов в cookies.
+        :rtype: django.http.JsonResponse
+        """
         response = super().post(request, *args, **kwargs)
         data = response.data
 
@@ -113,6 +177,14 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         return response
 
     def get_user(self, username):
+        """
+        Получает пользователя по имени пользователя.
+
+        :param username: Имя пользователя.
+        :type username: str
+        :return: Экземпляр пользователя.
+        :rtype: CustomUser
+        """
         from django.contrib.auth import get_user_model
         user = get_user_model()
         return user.objects.get(username=username)
@@ -120,7 +192,20 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
 # Обновление токена
 class CookieTokenRefreshView(APIView):
+    """
+    Представление для обновления access-токена с использованием refresh-токена из cookies.
+
+    Позволяет получить новый access-токен, используя refresh-токен, хранящийся в httpOnly cookies.
+    """
     def post(self, request):
+        """
+        Обрабатывает POST-запрос для обновления access-токена.
+
+        :param request: HTTP-запрос.
+        :type request: rest_framework.request.Request
+        :return: Ответ с новым access-токен или сообщением об ошибке.
+        :rtype: rest_framework.response.Response
+        """
         # Извлекаем refresh_token из cookies
         refresh_token = request.COOKIES.get('refresh_token')
 
