@@ -19,5 +19,6 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('auth/', include('custom_auth.urls')),  # Подключаем все пути из приложения custom_auth
+    path('auth/', include('custom_auth.urls')),
+    path('silk/', include('silk.urls', namespace='silk')),
 ]
